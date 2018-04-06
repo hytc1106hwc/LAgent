@@ -16,7 +16,17 @@ _M = {}
 --------------------------------------------------------------------------------
 -- Program constants
 --------------------------------------------------------------------------------
+
 _M.__DEBUG = false
+
+
+_M.LUA_51 = string.find(base._VERSION, "5.1") and true or false
+_M.LUA_52 = string.find(base._VERSION, "5.2") and true or false
+_M.LUA_53 = string.find(base._VERSION, "5.3") and true or false
+local _VERSION = "1.0.0"
+local _AUTHOR = "50362"
+local _CREATED_TIME = "2018/03/25"
+local FILE_NEW_LINE = "\n"
 
 --------------------------------------------------------------------------------
 -- Internal methods
@@ -102,14 +112,6 @@ do
 		mkdir(_M.TEMP_PATH)
 	end
 end
-_M.LUA_51 = string.find(base._VERSION, "5.1") and true or false
-_M.LUA_52 = string.find(base._VERSION, "5.2") and true or false
-_M.LUA_53 = string.find(base._VERSION, "5.3") and true or false
-
-local _VERSION = "1.0.0"
-local _AUTHOR = "50362"
-local _CREATED_TIME = "2018/03/25"
-local FILE_NEW_LINE = "\n"
 
 --------------------------------------------------------------------------------
 -- Public API
@@ -213,9 +215,10 @@ local function serialize(o)
     elseif type(o) == "table" then  
         str_serialize = str_serialize.."{"..FILE_NEW_LINE  
         for k,v in pairs(o) do  
-            str_serialize = str_serialize.." ["  
-            str_serialize = str_serialize..serialize(k)
-            str_serialize = str_serialize.."] = "  
+            str_serialize = str_serialize.." ["
+	    str_serialize = str_serialize..serialize(k)
+	    str_serialize = str_serialize.."] = "  
+
             str_serialize = str_serialize..serialize(v)
             str_serialize = str_serialize..","..FILE_NEW_LINE  
         end

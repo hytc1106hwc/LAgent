@@ -94,8 +94,16 @@ _M.extractResultFromFile = extractResultFromFile
 
 
 -- get function call in string format
-function _M.getStrFuncCall(funcName, strArgs)
-	return funcnName.."("..strArgs..")"
+function _M.getStrFuncCall(...)
+	local argsArr = {...}
+	local funcName = argsArr[1]
+	table.remove(argsArr, 1)
+	-- if utils.LUA_51 then
+	local strArgs = ""
+	for i, v in ipairs(argsArr) do
+		strArgs = strArgs..utils.serialize(v)
+	end
+	return funcName..""..strArgs..""
 end
 
 

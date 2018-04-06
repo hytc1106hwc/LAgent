@@ -172,7 +172,7 @@ function _M.setResults(...)
 	for i, v in ipairs(resultsTable) do
 		print("serilize: res"..i)
 		local str_serialize = utils.serialize(v)
-		handle:write("res"..i.." = "..str_serialize.."\n")
+		handle:write("res"..i.." = "..str_serialize..";\n")
 	end
 	handle:close()
 end
