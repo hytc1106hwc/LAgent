@@ -2,10 +2,10 @@
 This module solves the problem "Calling module function of low Lua version in High version lua interpreter", currently only support windows
 
 ## Usage
-- ** directory description
-  1. bin£ºThis is the directory holding lua interpreters
-  2. clibs: This is the directory holding libs
-  3. lua£ºThis is the directory holding lua modules
+ - **directory description**
+  1. bin:     This is the directory holding lua interpreters
+  2. clibs:   This is the directory holding libs
+  3. lua:	    This is the directory holding lua modules
 
 - **global usage**
 
@@ -22,14 +22,14 @@ This module solves the problem "Calling module function of low Lua version in Hi
 
   ## Examples
   ``` lua
-  -- /* when using in relative path, should specify package.path first, otherwise not */
-  -- /* package.path = "D:/demo/lua/?.lua;;" */
+  -- when using in relative path, should specify package.path first, otherwise not
+  -- package.path = "D:/demo/lua/?.lua;;"
 
   local lagent = require("utils.LAgent")
 
   local testType = 2
 
-if testType == 1 then
+  if testType == 1 then
 
 	lagent.execute(1,[[
 		local http = require("socket.http")
@@ -44,7 +44,8 @@ if testType == 1 then
 	print("res2=", c)
 	print("res3=", h)
 	print("res4=", s)
-elseif testType == 2 then
+	
+  elseif testType == 2 then
 	lagent.execute(1,[[
 		local http = require("socket.http")
 		local mime = require("mime")
@@ -61,7 +62,8 @@ elseif testType == 2 then
 	print("res2=", c)
 	print("res3=", h)
 	print("res4=", s)
-elseif testType == 3 then -- testing ftp upload
+	
+  elseif testType == 3 then -- testing ftp upload
 	lagent.execute(1, [[
 		local ftp = require('socket.ftp')
 		local ltn12 = require('ltn12')
@@ -80,7 +82,8 @@ elseif testType == 3 then -- testing ftp upload
 	local res, errMsg = lagent.getResults()
 	print("IsSuccess: ", res)
 	print("errMsg: ", errMsg)
-elseif testType == 4 then -- testing ftp download
+	
+  elseif testType == 4 then -- testing ftp download
 	lagent.execute(1, [[
 		local ftp = require('socket.ftp')
 		local ltn12 = require('ltn12')
@@ -100,7 +103,7 @@ elseif testType == 4 then -- testing ftp download
 	print("IsSuccess: ", res)
 	print("errMsg: ", errMsg)
 
-else
+  else
 	local myStr = "Hello World"
 	local funcStr = "base64.encode("..myStr..")"
 	lagent.execute(1,[[
@@ -110,6 +113,7 @@ else
 	local encodedStr = lagent.getResults()
 
 	print(encodedStr)
-end
+  end
 
   ```
+

@@ -2,9 +2,9 @@
 这个模块解决了“在高版本的Lua解释器中调用低版本的Lua模块函数”的问题，当前只支持Windows系统
 ## 使用说明
 - **目录说明**
-  1. bin目录：存放Lua多个版本的解释器
-  2. clibs目录：存放dll的目录
-  3. lua目录：存放lua模块的目录
+  1. bin目录:     存放Lua多个版本的解释器
+  2. clibs目录:   存放dll的目录
+  3. lua目录:      存放lua模块的目录
 
 - **全局使用**
 
@@ -21,14 +21,14 @@
 
   ## 例子
   ``` lua
-  -- /* 当在相对环境中使用时，应该先指定 package.path*/
-  -- /* package.path = "D:/demo/lua/?.lua;;" */
+  -- 当在相对环境中使用时，应该先指定 package.path
+  -- package.path = "D:/demo/lua/?.lua;;"
 
   local lagent = require("utils.LAgent")
 
   local testType = 2
 
-if testType == 1 then
+  if testType == 1 then
 
 	lagent.execute(1,[[
 		local http = require("socket.http")
@@ -43,7 +43,8 @@ if testType == 1 then
 	print("res2=", c)
 	print("res3=", h)
 	print("res4=", s)
-elseif testType == 2 then
+	
+  elseif testType == 2 then
 	lagent.execute(1,[[
 		local http = require("socket.http")
 		local mime = require("mime")
@@ -60,7 +61,8 @@ elseif testType == 2 then
 	print("res2=", c)
 	print("res3=", h)
 	print("res4=", s)
-elseif testType == 3 then -- testing ftp upload
+	
+  elseif testType == 3 then -- testing ftp upload
 	lagent.execute(1, [[
 		local ftp = require('socket.ftp')
 		local ltn12 = require('ltn12')
@@ -79,7 +81,8 @@ elseif testType == 3 then -- testing ftp upload
 	local res, errMsg = lagent.getResults()
 	print("IsSuccess: ", res)
 	print("errMsg: ", errMsg)
-elseif testType == 4 then -- testing ftp download
+	
+  elseif testType == 4 then -- testing ftp download
 	lagent.execute(1, [[
 		local ftp = require('socket.ftp')
 		local ltn12 = require('ltn12')
@@ -99,7 +102,7 @@ elseif testType == 4 then -- testing ftp download
 	print("IsSuccess: ", res)
 	print("errMsg: ", errMsg)
 
-else
+  else
 	local myStr = "Hello World"
 	local funcStr = "base64.encode("..myStr..")"
 	lagent.execute(1,[[
@@ -109,6 +112,7 @@ else
 	local encodedStr = lagent.getResults()
 
 	print(encodedStr)
-end
+  end
 
   ```
+
