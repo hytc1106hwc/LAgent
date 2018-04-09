@@ -3,18 +3,19 @@
 --		  and returning desired results
 -- Author	: ArisHu(50362)
 ---------------------------------------------------------------------------------
-local base = _G
+local base	= _G
 --require("libutils")
-local string = require("string")
-local table = require("table")
-local print = print
-local debug = require("debug")
-local utils = require("utils")
-local lfile = require("utils.LFile")
-local lasync = require("utils.LAsyncTask")
+local string	= require("string")
+local table	= require("table")
+local print	= print
+local debug	= require("debug")
+local utils	= require("utils")
+local lfile	= require("utils.LFile")
+local ltf	= require("utils.ltf")
+local lasync	= require("utils.LAsyncTask")
 
-utils.LAgent = {}
-local _M = utils.LAgent
+utils.LAgent	= {}
+local _M	= utils.LAgent
 
 --------------------------------------------------------------------------------
 -- Program constants
@@ -30,6 +31,9 @@ local LUA_EXE_TYPE = {
 	INTERPRETER_LUA_53_PATH
 }
 local FILE_NEW_LINE = lfile.FILE_NEW_LINE
+
+local MIN_LUA_INTERPRETER_NUM = 1
+local MAX_LUA_INTERPRETER_NUM = 3
 
 local __DEBUG = utils.__DEBUG
 
@@ -61,25 +65,44 @@ end
 -- use interpreter to execute the temporary result
 -- must use /WAIT option for waiting new process terminated, 
 -- otherwise will throw error
-local function executeCmd(prog)
+local function executeCmd(prog, hidden)
     --local pipe
     local command
-    if __DEBUG then
-	command = "start /WAIT cmd /c "..prog
-	--pipe = utils.try(io.popen, command)
-	--pipe:close()
-	local handle = io.open(lfile.getBatFilePath(), "w+")
-	handle:write(command)
-	handle:close()
-	os.execute(command)
+    if hidden == nil then
+        if __DEBUG then
+            command = "start /WAIT cmd /c "..prog
+            --pipe = utils.try(io.popen, command)
+            --pipe:close()
+
+            local handle = io.open(lfile.getBatFilePath(), "w+")
+            handle:write(command)
+            handle:close()
+            os.execute(command)
+        else
+            command = "start /MIN /WAIT cmd /Q /c "..prog
+            --pipe = utils.try(io.popen, command)
+            --pipe:close()
+
+            os.execute(command)
+        end
+        return true
     else
-	command = "start /MIN /WAIT cmd /Q /c "..prog
-	--pipe = utils.try(io.popen, command)
-	--pipe:close()
-	os.execute(command)
+        if type(hidden) ~= "boolean" then
+            return false, "at function executeCmd: parameter should be a boolean value"
+        end
+        if hidden then
+            command = "start /MIN cmd /Q /c "..prog
+            --pipe = utils.try(io.popen, command)
+            --pipe:close()
+            os.execute(command)
+        else
+            command = "start cmd /Q /k "..prog
+            --pipe = utils.try(io.popen, command)
+            --pipe:close()
+            os.execute(command)
+        end
     end
-    
-    return true
+
 end
 
 --------------------------------------------------------------------------------
@@ -128,8 +151,8 @@ function _M.execute(interpreterType, header, funcCall, resultCount)
 	end
 
 	local tp = base.tonumber(interpreterType)
-	if  tp < 1 or tp > 3 then
-		return nil, "first parameter should between 1 or 2 or 3"
+	if  tp < MIN_LUA_INTERPRETER_NUM or tp > MAX_LUA_INTERPRETER_NUM then
+		return nil, "first parameter should between "..MIN_LUA_INTERPRETER_NUM.." and "..MAX_LUA_INTERPRETER_NUM
 	end
 
 	local ret, errMsg
@@ -166,6 +189,38 @@ function _M.execute(interpreterType, header, funcCall, resultCount)
 	end
 	utils.try(lck.release)
 	return ret,errMsg
+end
+
+
+-- use specified lua interpreter to execute the script
+function _M.runScript(interpreterType, script)
+	if base.type(interpreterType) ~= "number" then
+		return nil, "first parameter should be a number"
+	end
+	
+	local tp = base.tonumber(interpreterType)
+	if  tp < MIN_LUA_INTERPRETER_NUM or tp > MAX_LUA_INTERPRETER_NUM then
+		return nil, "first parameter should between "..MIN_LUA_INTERPRETER_NUM.." and "..MAX_LUA_INTERPRETER_NUM
+	end
+
+    -- default using lua5.1 interpreter
+    interpreterType = interpreterType or 1
+
+	local tp = base.tonumber(interpreterType)
+	if  tp < 1 or tp > 3 then
+		return nil, "first parameter should between 1 or 2 or 3"
+	end
+
+	local INTERPRETER_PATH = utils.normalize_in_windows(LUA_EXE_TYPE[interpreterType])
+
+	local tfile = ltf:create("lua")
+	tfile:write("\n".."package.cpath = \""..utils.single_slash_to_backslash(utils.C_PATH).."?.dll\"")
+	tfile:write("\n".."package.path = \""..utils.single_slash_to_backslash(utils.LUA_PATH).."?.lua;;\"")
+	tfile:write("\n"..script)
+	tfile:close()
+	local tfilePath = tfile:getPath()
+	local ret, errMsg = utils.try(executeCmd, INTERPRETER_PATH.." "..tfilePath, false)
+	return ret, errMsg
 end
 
 return _M

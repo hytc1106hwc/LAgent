@@ -1,5 +1,8 @@
 # LAgent
 这个模块解决了“在高版本的Lua解释器中调用低版本的Lua模块函数”的问题，当前只支持Windows系统
+
+[English](./README.md)
+
 ## 使用说明
 - **目录说明**
   1. bin目录:     存放Lua多个版本的解释器

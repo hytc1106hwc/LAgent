@@ -1,6 +1,8 @@
 # LAgent
 This module solves the problem "Calling module function of low Lua version in High version lua interpreter", currently only support windows
 
+[中文](./README-CN.md)
+
 ## Usage
  - **directory description**
   1. bin:     This is the directory holding lua interpreters

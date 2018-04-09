@@ -9,6 +9,8 @@ local table = require("table")
 local io = require("io")
 local string = require("string")
 local debug = require("debug")
+local math = require("math")
+local os = require("os")
 local print = print
 
 _M = {}
@@ -16,10 +18,7 @@ _M = {}
 --------------------------------------------------------------------------------
 -- Program constants
 --------------------------------------------------------------------------------
-
 _M.__DEBUG = false
-
-
 _M.LUA_51 = string.find(base._VERSION, "5.1") and true or false
 _M.LUA_52 = string.find(base._VERSION, "5.2") and true or false
 _M.LUA_53 = string.find(base._VERSION, "5.3") and true or false
@@ -48,10 +47,23 @@ _M.single_slash_to_backslash = single_slash_to_backslash
 
 -- whether or not file or directory is exist
 function isFileExsist(filePath)
-	local pipe = io.popen(" if exist "..filePath.." (echo 1) else (echo 0) ", "r")
-	local res = tonumber(pipe:read("*a"), 10)
-	pipe:close()
-	return res == 1
+	local success, handleOrErrMsg, errMsg, code = pcall(os.rename, filePath, filePath)
+    
+    if success then -- if execute successfully
+        if handleOrErrMsg then
+            handleOrErrMsg:close()
+        end
+        if not handleOrErrMsg then
+            if code == 13 then
+                -- Permission denied, but it exists
+                return true
+            end
+        else
+            return true
+        end      
+    else
+        base.error(base.tostring(handleOrErrMsg))
+    end
 end
 _M.isFileExsist = isFileExsist
 
@@ -108,7 +120,8 @@ _M.LUA_PATH = _M.ROOT_PATH.."lua\\"
 
 _M.TEMP_PATH = os.getenv("WINDIR").."\\temp\\utils\\"
 do
-	if not isFileExsist(_M.TEMP_PATH) then
+    local tempDirExist = isFileExsist(_M.TEMP_PATH)
+	if  tempDirExist or tempDirExist == false then
 		mkdir(_M.TEMP_PATH)
 	end
 end
