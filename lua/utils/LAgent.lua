@@ -133,11 +133,7 @@ end
 -- get execution results
 function _M.getResults()
 	-- print("LAgent: LUA VERSION = ", base._VERSION)
-	if utils.LUA_51 then
-		return base.unpack(lfile.getResults())
-	else
-		return table.unpack(lfile.getResults())
-	end
+	return lfile.getResults()
 end
 
 -- use interpreter to execute command

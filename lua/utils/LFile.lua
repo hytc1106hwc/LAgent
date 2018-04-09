@@ -142,9 +142,10 @@ local function appendFuncCall(funcCall, resultCount)
 
 	utils.try(io.write, FILE_NEW_LINE.."local "..strResultHolder.." = "..funcCall)
 
-	local resultFilePath = utils.single_slash_to_double(getResultFilePath())
-	utils.try(io.write, FILE_NEW_LINE.."local resultFilePath = \""..resultFilePath.."\"")
-	utils.try(io.write, FILE_NEW_LINE.."lfile.setResults(resultFilePath, "..strResultHolder..")")
+	--local resultFilePath = utils.single_slash_to_double(getResultFilePath())
+	utils.try(io.write, FILE_NEW_LINE.."print("..strResultHolder..")")
+	--utils.try(io.write, FILE_NEW_LINE.."local resultFilePath = \""..resultFilePath.."\"")
+	utils.try(io.write, FILE_NEW_LINE.."lfile.setResults("..strResultHolder..")")
 	utils.try(io.flush)
 	utils.try(io.close, handle)
 	io.output(dOut)
@@ -164,17 +165,27 @@ _M.delete = deleteTempFiles
 -- serialize results to result file
 -- each result has name prefix 'res', plus the result's index
 function _M.setResults(...)
-	local resultsTable = {...}
-	local resultFilePath = resultsTable[1]
-	table.remove(resultsTable, 1)
+	print("SetResults: results: ", ...)
+
+	local resultFilePath = getResultFilePath()
 	print("setResults: result file path: ", resultFilePath)
+
 	local handle = io.open(resultFilePath, "w+")
-	for i, v in ipairs(resultsTable) do
-		print("serilize: res"..i)
-		local str_serialize = utils.serialize(v)
-		handle:write("res"..i.." = "..str_serialize..";\n")
+	local paramscount = select("#", ...)
+	print("resultsTable size: ", paramscount)
+	
+	-- bug-fixed: when do operation with ...
+	-- should use select function to get the param
+	if handle then
+		for i = 1, paramscount do
+			print("serilize: res"..i)
+			local param = base.select(i, ...)
+			local str_serialize = utils.serialize(param)
+			handle:write("res"..i.." = "..str_serialize..";\n")
+		end
+		handle:flush()
+		handle:close()
 	end
-	handle:close()
 end
 
 -- get result from result file
@@ -187,20 +198,7 @@ function _M.getResults()
 	end
 
 	base.dofile(getResultFilePath())
-	table.insert(resultsTable, base.res1)
-	table.insert(resultsTable, base.res2)
-	table.insert(resultsTable, base.res3)
-	table.insert(resultsTable, base.res4)
-	table.insert(resultsTable, base.res5)
-	table.insert(resultsTable, base.res6)
-	table.insert(resultsTable, base.res7)
-	table.insert(resultsTable, base.res8)
-	
-	if not __DEBUG then
-		deleteTempFiles()
-	end
-
-	return resultsTable
+	return base.res1, base.res2, base.res3, base.res4, base.res5
 end
 
 return _M
